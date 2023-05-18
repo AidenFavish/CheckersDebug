@@ -101,9 +101,7 @@ extends ApplicationAdapter
         //these 2 lines clear the screen and set the background color every FRAME. 
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        renderer.begin(ShapeType.Filled); 
         batch.setProjectionMatrix(viewport.getCamera().combined);
-        batch.begin();
         if(gamestate == GameState.GAME)
         {
             fillBoard();//fills out checkerboard
@@ -117,6 +115,7 @@ extends ApplicationAdapter
         if(gamestate == GameState.MENU)
         {
             updateMouseLoc();
+            //System.out.println("x: " + temp.x + "\ty: " + temp.y + "\tbx: " + temp.x + "\ty:" + temp.y);
 
             if(Intersector.overlaps(temp,button1) && Gdx.input.justTouched())
             {
@@ -132,8 +131,6 @@ extends ApplicationAdapter
             drawMenu();
         if(gamestate == GameState.INSTRUCTIONS)
             drawInstructions();
-        renderer.end();
-        batch.end();
     }
 
     private void updateMouseLoc()
@@ -149,6 +146,7 @@ extends ApplicationAdapter
 
     private void drawMenu()
     {
+        batch.begin();
         updateMouseLoc();
 
         batch.draw(images.get(2),0,0,WORLD_WIDTH,WORLD_HEIGHT);//Background
@@ -175,11 +173,13 @@ extends ApplicationAdapter
         }   
 
         System.out.println("Menu Drawn");
-
+        batch.end();
     }
 
     private void drawInstructions()
     {
+        batch.begin();
+        
         batch.draw(images.get(6),WORLD_WIDTH/2-images.get(6).getWidth()/2, 
             WORLD_HEIGHT/2, images.get(6).getWidth(),images.get(6).getHeight());
         font.setColor(1f, 0f, 0f, 1f);
@@ -208,6 +208,8 @@ extends ApplicationAdapter
             layout, 
             WORLD_WIDTH / 2 - layout.width / 2, 
             WORLD_HEIGHT/2-135 + layout.height/2); font.setColor(1f, 0f, 0f, 1f);
+            
+        batch.end();
     }
 
     private void fillBoard()
@@ -229,19 +231,18 @@ extends ApplicationAdapter
         {
             for(int c = 0; c<8; c++)
             {             
-                if(board[r][c].getColor().equals(Color.BLACK) && r<2)
+                if(board[r][c].getColor().equals(Color.WHITE) && r<2)
                 {
-                    whitePieces[r][c] = new Pieces(300, //x location depends on the column
-                        300,images.get(7));
+                    whitePieces[r][c] = new Pieces(15+80*c, //x location depends on the column
+                        WORLD_HEIGHT - 65 - r*80,images.get(7));
                     whiteCircles[r][c] = new Circle((float)r,(float)c, 50);
                     System.out.println("White Piece at " + r + " " + c + " constructed");
                 }
 
                 if(board[r][c].getColor().equals(Color.BLACK) && r>=6)
                 {
-                    blackPieces[r][c] = new Pieces(300, //x location depends on the column
-                        300, //y location depends on the row
-                        images.get(8));
+                    blackPieces[r][c] = new Pieces(15+80*c, //x location depends on the column
+                        WORLD_HEIGHT - 65 - r*80,images.get(8));
                     blackCircles[r][c] = new Circle((float)r,(float)c, 50);
                     System.out.println("Black Piece at " + r + " " + c + " constructed");
                 }
@@ -254,7 +255,8 @@ extends ApplicationAdapter
 
     private void drawBoard()
     {
-         for(int r = 0; r < board.length; r++)
+        renderer.begin(ShapeType.Filled);
+        for(int r = 0; r < board.length; r++)
         {
             for(int c = 0; c < board[0].length; c++)
             {
@@ -265,6 +267,8 @@ extends ApplicationAdapter
                     temp.width, temp.height);
             }
         }
+        renderer.end();
+        batch.begin();
         for(int r = 0; r<board.length; r++)
         {
             for(int c = 0; c<board[0].length; c++)
@@ -293,7 +297,7 @@ extends ApplicationAdapter
             }
         }
         System.out.println("Game Drawn");
-
+        batch.end();
     }
 
     @Override
